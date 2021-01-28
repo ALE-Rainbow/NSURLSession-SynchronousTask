@@ -34,17 +34,20 @@
 - (nullable NSData *)sendSynchronousDataTaskWithRequest:(nonnull NSURLRequest *)request returningResponse:(NSURLResponse *_Nullable*_Nullable)response error:(NSError *_Nullable*_Nullable)error {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block NSData *data = nil;
+    __block NSError *err = nil;
+    
     [[self dataTaskWithRequest:request completionHandler:^(NSData *taskData, NSURLResponse *taskResponse, NSError *taskError) {
         data = taskData;
+        err = taskError;
         if (response) {
             *response = taskResponse;
-        }
-        if (error) {
-            *error = taskError;
         }
         dispatch_semaphore_signal(semaphore);
     }] resume];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    if (error != nil)
+        *error = err;
     
     return data;
 }
@@ -58,17 +61,20 @@
 - (nullable NSURL *)sendSynchronousDownloadTaskWithRequest:(nonnull NSURLRequest *)request returningResponse:(NSURLResponse *_Nullable*_Nullable)response error:(NSError *_Nullable*_Nullable)error {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block NSURL *location = nil;
+    __block NSError *err = nil;
+    
     [[self downloadTaskWithRequest:request completionHandler:^(NSURL *taskLocation, NSURLResponse *taskResponse, NSError *taskError) {
         location = taskLocation;
+        err = taskError;
         if (response) {
             *response = taskResponse;
-        }
-        if (error) {
-            *error = taskError;
         }
         dispatch_semaphore_signal(semaphore);
     }] resume];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    if (error != nil)
+        *error = err;
     
     return location;
 }
@@ -82,17 +88,20 @@
 - (nullable NSData *)sendSynchronousUploadTaskWithRequest:(nonnull NSURLRequest *)request fromData:(nonnull NSData *)bodyData returningResponse:(NSURLResponse *_Nullable*_Nullable)response error:(NSError *_Nullable*_Nullable)error {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block NSData *data = nil;
+    __block NSError *err = nil;
+    
     [[self uploadTaskWithRequest:request fromData:bodyData completionHandler:^(NSData *taskData, NSURLResponse *taskResponse, NSError *taskError) {
         data = taskData;
+        err = taskError;
         if (response) {
             *response = taskResponse;
-        }
-        if (error) {
-            *error = taskError;
         }
         dispatch_semaphore_signal(semaphore);
     }] resume];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    
+    if (error != nil)
+        *error = err;
     
     return data;
 }
